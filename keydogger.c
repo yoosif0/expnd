@@ -29,7 +29,7 @@ static char *KEYBOARD_DEVICE = NULL;
 static char *DAEMON = DAEMON_NAME;
 static struct trie *TRIE = NULL;
 
-char *DEBUG_RC_PATH = "./keydoggerrc";
+char *DEBUG_RC_PATH = "./expndrc";
 
 static int fkeyboard_device;
 static int vkeyboard_device;
@@ -331,18 +331,7 @@ void wide_to_utf8(wchar_t *input, char *output)
 
 void read_from_rc(char *path)
 {
-    char *user = getlogin();
-    if (user == NULL)
-    {
-        printf("Error getting current user");
-        exit(EUSER);
-    }
-    char rc_file_path[256];
-    if (snprintf(rc_file_path, 256, "/home/%s/%s", user, RC_PATH) < 0)
-    {
-        printf("Error constructing config path %s\n", RC_PATH);
-        exit(ESTR);
-    }
+    char rc_file_path[256] = "/root/.config/expndrc";
 
     TRIE = malloc(sizeof(struct trie));
     init_trie(TRIE, NULL);
@@ -866,29 +855,6 @@ void daemonize_keydogger()
     keydogger_daemon();
 }
 
-bool check_privileges()
-{
-    if (environ == NULL)
-    {
-        printf("Error accessing ENV variables\n");
-        exit(EENV);
-    }
-    int i = 0;
-    while (environ[i] != NULL)
-    {
-        if (strncmp("USER=ROOT", environ[i], 9) == 0)
-        {
-            return true;
-        }
-        if (strncmp("SUDO_COMMAND", environ[i], 12) == 0)
-        {
-            return true;
-        }
-        i++;
-    }
-    return false;
-}
-
 int is_running()
 {
     char command[50];
@@ -964,12 +930,6 @@ int main(int argc, char *argv[])
     {
         printf("Usage error: keydogger start | stop | status | debug | viz\n");
         exit(EUSAGE);
-    }
-
-    if (!check_privileges())
-    {
-        printf("Need sudo privileges\n");
-        exit(EPERM);
     }
 
     pid_t pid;

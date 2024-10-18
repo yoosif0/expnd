@@ -3,7 +3,7 @@ KEYDOGGER_KEYBOARD=/dev/input/event2
 
 DEPENDENCIES=wl-copy wl-paste
 DAEMON_NAME=keydoggerd
-PREFIX=/usr/local/bin/
+PREFIX=/opt/
 CALLGRIND_FILE=benchmark.out
 
 .PHONY: build
